@@ -40,7 +40,6 @@ install:
 
 script:
   - pytest --cov=pyirf --cov-report=xml
-  - python examples/calculate_eventdisplay_irfs.py
   - travis-sphinx -v --outdir=docbuild build --source=docs/
 
 after_script:
@@ -63,4 +62,4 @@ deploy:
   on:
     tags: true
     branch: master
-    condition: $TRAVIS_PYTHON_VERSION = "3.7"
+    condition: $PYTHON_VERSION = "3.7"
