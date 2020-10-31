@@ -94,26 +94,51 @@ run_header_electron = {
         "diff_cone": 10
 }
 
-prefix = '...' # path to protopipe DL2 files
+# Dictionary of the specific parameters of your analysis
+
+analysis = 'STDFIT'
+config = {
+    'reco_energy': 'reco_energy_' + analysis,
+    'xi': 'xi_' + analysis,
+    'gammaness': 'gammaness_' + analysis,
+    'reco_alt': 'reco_alt_' + analysis,
+    'reco_az': 'reco_az_'  + analysis
+}
+'''
+config = {
+    'reco_energy': 'reco_energy',
+    'xi': 'xi',
+    'gammaness': 'gammaness',
+    'reco_alt': 'reco_alt',
+    'reco_az': 'reco_az'
+}
+'''
+
+#prefix_in = '...' # path to protopipe DL2 files
+prefix_in = '/ctadata/gaia/CCin2P3_Truncated/Truncated_Images_Protopipe/More_Then_2_Telescopes/STD_FIT_Protopipe_cut10pix_cut300size/data/DL2/DL2_new_RF/Events_ABC'
+#prefix_in = '/ctadata/gaia/CCin2P3_Truncated/Truncated_Images_Protopipe/More_Then_2_Telescopes/STD_Protopipe_NO/data/DL2/DL2_new_RF/Events_AB'
+
+#prefix_out = '...'
+prefix_out = '/ctadata/gaia/PyIRF_data/IRFs_Sensitivity/Protopipe_Pyirf/STD_FIT_protopipe_cut10pix_cut300size/Baseline/New_RF/performance_' + analysis
+#prefix_out = '/ctadata/gaia/PyIRF_data/IRFs_Sensitivity/Protopipe_Pyirf/STD_protopipe_NO/Baseline/New_RF/'
 
 particles = {
     "gamma": {
-        "file": prefix + "/dl2_tail_gamma_merged.h5",
+        "file": prefix_in + "/dl2_tail_gamma_merged.h5",
         "target_spectrum": CRAB_HEGRA,
         "run_header": run_header_gamma
     },
     "proton": {
-        "file": prefix + "/dl2_tail_proton_merged.h5",
+        "file": prefix_in + "/dl2_tail_proton_merged.h5",
         "target_spectrum": IRFDOC_PROTON_SPECTRUM,
         "run_header": run_header_proton
     },
     "electron": {
-        "file": prefix + "/dl2_tail_electron_merged.h5",
+        "file": prefix_in + "/dl2_tail_electron_merged.h5",
         "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
         "run_header": run_header_electron
     },
 }
-
 
 def main():
     logging.basicConfig(level=logging.INFO)
@@ -121,7 +146,7 @@ def main():
 
     for k, p in particles.items():
         log.info(f"Simulated {k.title()} Events:")
-        p["events"], p["simulation_info"] = read_protopipe_hdf5(p["file"],p["run_header"])
+        p["events"], p["simulation_info"] = read_protopipe_hdf5(p["file"],p["run_header"], config)
 
         p["simulated_spectrum"] = PowerLaw.from_simulation(p["simulation_info"], T_OBS)
         p["events"]["weight"] = calculate_event_weights(
@@ -334,7 +359,7 @@ def main():
     hdus.append(fits.BinTableHDU(bias_resolution, name="ENERGY_BIAS_RESOLUTION"))
 
     log.info('Writing outputfile')
-    fits.HDUList(hdus).writeto("../pyirf_protopipe.fits.gz", overwrite=True)
+    fits.HDUList(hdus).writeto(prefix_out + "/pyirf_protopipe.fits.gz", overwrite=True)
 
 if __name__ == "__main__":
     main()

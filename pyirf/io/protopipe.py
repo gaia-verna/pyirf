@@ -8,7 +8,7 @@ from ..simulations import SimulatedEventsInfo
 
 log = logging.getLogger(__name__)
 
-def read_protopipe_hdf5(infile, run_header):
+def read_protopipe_hdf5(infile, run_header, config):
     """
     Read a DL2 HDF5 file as produced by the protopipe pipeline:
     https://github.com/cta-observatory/protopipe
@@ -20,6 +20,14 @@ def read_protopipe_hdf5(infile, run_header):
         
     run_header: dict
         Dictionary with info about simulated particle informations
+        
+    config: dict
+        Dictionary some specific column names for:
+        - reco_energy
+        - xi
+        - gammaness
+        - reco_alt
+        - reco_az
 
     Returns
     -------
@@ -39,13 +47,13 @@ def read_protopipe_hdf5(infile, run_header):
 
     events = QTable([list(df['obs_id']),
                      list(df['event_id']),
-                     list(df['xi']) * u.deg, 
+                     list(df[config['xi']]) * u.deg, 
                      list(df['mc_energy']) * u.TeV, 
-                     list(df['reco_energy']) * u.TeV,
-                     list(df['gammaness']),
+                     list(df[config['reco_energy']]) * u.TeV,
+                     list(df[config['gammaness']]),
                      list(df['NTels_reco']),
-                     list(df['reco_alt']) * u.deg,
-                     list(df['reco_az']) * u.deg,
+                     list(df[config['reco_alt']]) * u.deg,
+                     list(df[config['reco_az']]) * u.deg,
                      true_alt * u.deg,
                      true_az * u.deg,
                      pointing_alt * u.deg,
