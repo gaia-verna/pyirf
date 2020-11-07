@@ -84,15 +84,19 @@ def main():
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("pyirf").setLevel(logging.DEBUG)
 
-    for k, p in particles.items():
-        log.info(f"Simulated {k.title()} Events:")
+    for particle_type, p in particles.items():
+        log.info(f"Simulated {particle_type.title()} Events:")
         p["events"], p["simulation_info"] = read_eventdisplay_fits(p["file"])
+        p["events"]["particle_type"] = particle_type
 
         p["simulated_spectrum"] = PowerLaw.from_simulation(p["simulation_info"], T_OBS)
         p["events"]["weight"] = calculate_event_weights(
             p["events"]["true_energy"], p["target_spectrum"], p["simulated_spectrum"]
         )
-        p["events"]["source_fov_offset"] = calculate_source_fov_offset(p["events"])
+        for prefix in ('true', 'reco'):
+            k = f"{prefix}_source_fov_offset"
+            p["events"][k] = calculate_source_fov_offset(p["events"], prefix=prefix)
+
         # calculate theta / distance between reco and assuemd source positoin
         # we handle only ON observations here, so the assumed source pos
         # is the pointing position
@@ -149,7 +153,7 @@ def main():
         gammas[gammas["selected_theta"]],
         background,
         reco_energy_bins=sensitivity_bins,
-        gh_cut_values=np.arange(-1.0, 1.005, 0.05),
+        gh_cut_values=np.arange(-0.5, 1.005, 0.01),
         theta_cuts=theta_cuts,
         op=operator.ge,
         alpha=ALPHA,
@@ -283,7 +287,7 @@ def main():
         fov_offset_bins=np.arange(0, 11) * u.deg,
     ))
     hdus.append(create_psf_table_hdu(
-            psf, true_energy_bins, source_offset_bins, fov_offset_bins,
+        psf, true_energy_bins, source_offset_bins, fov_offset_bins,
     ))
     hdus.append(create_rad_max_hdu(
         theta_cuts_opt["cut"][:, np.newaxis], theta_bins, fov_offset_bins

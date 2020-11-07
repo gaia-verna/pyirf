@@ -11,14 +11,16 @@ extras_require = {
         "sphinx_automodapi",
         "numpydoc",
         "nbsphinx",
-        "uproot~=3.0",
+        "uproot4",
+        "awkward1",
     ],
     "tests": [
         "pytest",
         "pytest-cov",
-        "gammapy~=0.17",
+        "gammapy~=0.18",
         "ogadf-schema~=0.2.3",
-        "uproot~=3.0",
+        "uproot4",
+        "awkward1",
     ],
 }
 
@@ -32,7 +34,6 @@ setup(
         "astropy~=4.0,>=4.0.2",
         "matplotlib",
         "numpy>=1.18",
-        "pandas",
         "scipy",
         "tqdm",
         "tables",
