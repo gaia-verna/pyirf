@@ -126,6 +126,7 @@ def create_histogram_table(events, bins, key="reco_energy"):
     hist[key + "_high"] = bins[1:]
     hist[key + "_center"] = 0.5 * (hist[key + "_low"] + hist[key + "_high"])
     hist["n"], _ = np.histogram(events[key], bins)
+    hist["mc_n"] = hist["n"]
 
     # also calculate weighted number of events
     if "weight" in events.colnames:
@@ -143,6 +144,7 @@ def create_histogram_table(events, bins, key="reco_energy"):
             particle = group_key['particle_type']
 
             hist["n_" + particle], _ = np.histogram(group[key], bins)
+            hist["mc_n_" + particle] = hist["n_" + particle]
 
             # also calculate weighted number of events
             col = "n_" + particle

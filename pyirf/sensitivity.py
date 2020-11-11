@@ -250,9 +250,10 @@ def calculate_sensitivity(
         k = "reco_energy_" + key
         s[k] = signal_hist[k]
 
-    s["n_signal_mc"] = signal_hist["n"]
+    s["n_signal_mc"] = signal_hist["mc_n"]
     s["n_signal"] = signal_hist["n"] * rel_sens
     s["n_signal_weighted"] = signal_hist["n_weighted"] * rel_sens
+    s["n_background_mc"] = background_hist["mc_n"]
     s["n_background"] = background_hist["n"]
     s["n_background_weighted"] = background_hist["n_weighted"]
 
